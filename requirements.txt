@@ -1,0 +1,9 @@
+requests
+beautifulsoup4
+html5lib
+lxml
+nltk
+scikit-learn
+pandas
+selenium
+webdriver-manager
