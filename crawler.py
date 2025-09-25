@@ -18,7 +18,7 @@ MAX_PAGES = 69
 
 
 # -------------------------
-# Utilidades de DB
+# BD Utilities
 # -------------------------
 def init_db(db_path: str):
     con = sqlite3.connect(db_path)
@@ -83,7 +83,7 @@ def open_driver(headless=True):
 
 
 def _wait_results_loaded(wait: WebDriverWait):
-    # Espera a que exista al menos un <li.item-programa>
+    # Wait until at least one <li.item-programa> exists
     wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "li.item-programa.ais-Hits-item")))
 
 
@@ -95,7 +95,7 @@ def _first_card_title_text(driver) -> str:
 
 
 # -------------------------
-# Listado (catálogo)
+# Catalog listing
 # -------------------------
 def get_cards_on_page(driver):
     """
@@ -148,16 +148,16 @@ def iterate_pages_and_collect_links(driver, start_url: str, pages: int, delay: f
             a = li.find_element(By.CSS_SELECTOR, "a.page-link")
             driver.execute_script("arguments[0].click();", a)
 
-            # Espera a que el li tenga la clase de seleccionado
+            # Wait for the <li> to have the selected class
             wait.until(lambda d: "ais-Pagination-item--selected" in li.get_attribute("class"))
 
-            # Espera a que cambie el primer título (para asegurar que no quedó la misma página)
+            # Wait for the first card title to change (to ensure the page actually changed)
             wait.until(lambda d: _first_card_title_text(d) != last_first_title)
             time.sleep(delay)
             last_first_title = _first_card_title_text(driver)
 
         except Exception:
-            # Si i=1 ya está seleccionado, o si el sitio tardó: intentamos continuar
+            # If i=1 is already selected, or if the site took too long: try to continue
             pass
 
         cards = get_cards_on_page(driver)
@@ -177,7 +177,7 @@ def iterate_pages_and_collect_links(driver, start_url: str, pages: int, delay: f
 
 
 # -------------------------
-# Ficha del curso
+# Course detail page
 # -------------------------
 def _text_or_none(el):
     return el.get_text(" ", strip=True) if el else None
@@ -186,16 +186,16 @@ def _text_or_none(el):
 def parse_course_detail(html: str, url: str) -> dict:
     soup = BeautifulSoup(html, "lxml")
 
-    # Título: suele estar en h2.font-weight-bold.mb-md-0 (fallback a h1/h2)
+    # Title: usually in h2.font-weight-bold.mb-md-0 (fallback to h1/h2)
     title_el = (soup.select_one("h2.font-weight-bold.mb-md-0") or
                 soup.select_one("h1.font-weight-bold") or
                 soup.select_one("h1, h2"))
     title = _text_or_none(title_el) or ""
 
-    # Precio: <span class="course-price"><div>$ ...</div></span>
+    # Price: <span class="course-price"><div>$ ...</div></span>
     price = _text_or_none(soup.select_one("span.course-price"))
 
-    # Sidebar: NIVEL, DURACIÓN, TUTORÍA, INICIO (cada uno como h6 + valor en .col > div)
+    # Sidebar: NIVEL, DURACIÓN, TUTORÍA, INICIO (each as h6 + value in .col > div)
     def read_sidebar_value(label_text: str):
         h6 = soup.find("h6", class_="font-title-color m-0",
                        string=lambda s: s and label_text.lower() in s.lower())
@@ -207,15 +207,15 @@ def parse_course_detail(html: str, url: str) -> dict:
         val = row.select_one(".col > div")
         return _text_or_none(val)
 
-    category   = read_sidebar_value("NIVEL")        # solicitado como 'category'
+    category   = read_sidebar_value("NIVEL")        # requested as 'category'
     duration   = read_sidebar_value("DURACIÓN")
     tutoria    = read_sidebar_value("TUTORÍA")
     start_date = read_sidebar_value("INICIO")
 
-    modality   = None     # no aparece en tu ejemplo
-    location   = None     # no aparece en tu ejemplo
+    modality   = None     
+    location   = None     
 
-    # Propuesta de valor: bloque con clase específica
+    # Value proposition: block with specific class
     vp_block = soup.select_one(".course-wrapper-seccion.course-wrapper-content--proposal")
     value_proposal = None
     if vp_block:
@@ -224,7 +224,7 @@ def parse_course_detail(html: str, url: str) -> dict:
             header.decompose()
         value_proposal = _text_or_none(vp_block)
 
-    # Descripción (Presentación del programa)
+    # Description (Program presentation)
     desc_block = soup.select_one(".course-wrapper-seccion.course-wrapper-content--presentation")
     description = None
     if desc_block:
@@ -249,23 +249,23 @@ def parse_course_detail(html: str, url: str) -> dict:
 
 
 # -------------------------
-# Flujo principal
+# Main flow
 # -------------------------
 def crawl(args):
     con = init_db(args.db)
     driver = open_driver(headless=not args.show)
 
     try:
-        # 1) recopilar enlaces de cursos en el catálogo (paginación p1..p{pages})
+        # 1) collect course links from the catalog (pagination p1..p{pages})
         course_links = iterate_pages_and_collect_links(driver, args.start, args.pages, args.delay)
         print(f"Total de enlaces de cursos: {len(course_links)}")
 
-        # 2) visitar fichas y guardar
+        # 2) visit course detail pages and save
         visited = 0
         for link in sorted(course_links):
             try:
                 driver.get(link)
-                time.sleep(args.delay)  # breve espera por render
+                time.sleep(args.delay)  # brief wait for rendering
                 detail_html = driver.page_source
                 data = parse_course_detail(detail_html, link)
                 data["raw_html"] = detail_html if args.save_html else None

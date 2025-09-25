@@ -34,7 +34,7 @@ def search(con, interests: list, top: int = 20):
     if not match:
         return []
 
-    # Intentar ordenar por BM25 (si tu SQLite lo soporta).
+    # Try to use bm25 if available
     try:
         sql = """
         SELECT c.url, c.title, bm25(courses_fts) as score
@@ -46,7 +46,7 @@ def search(con, interests: list, top: int = 20):
         """
         return list(con.execute(sql, (match, top)))
     except sqlite3.OperationalError:
-        # Fallback sin bm25
+        # Fallback without bm25
         sql = """
         SELECT c.url, c.title, f.rowid as score
         FROM courses_fts f

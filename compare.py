@@ -3,7 +3,7 @@ from typing import Sequence
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Stopwords españolas (como LISTA, no set)
+# Spanish stopwords (as a LIST, not a set)
 SPANISH_STOPWORDS = [
     "a","al","algo","algunas","algunos","ante","antes","aquel","aquella","aquellas","aquellos","aqui",
     "asi","aun","aunque","bajo","bien","cada","como","con","contra","cual","cuales","cuando","de","del",
@@ -28,7 +28,7 @@ def _tfidf_cosine(texts: Sequence[str]) -> float:
     b = (texts[1] or "").strip()
     if not a and not b:
         return 0.0
-    # Si uno está vacío y el otro no, la similitud queda 0
+    # If one is empty and the other is not, similarity is 0
     if not a or not b:
         return 0.0
 
@@ -63,7 +63,7 @@ def compare_course_ids(con: sqlite3.Connection, id_a: int, id_b: int) -> float:
         return " ".join([t for t in (title, desc, vp, tut) if t])
     return compare_texts(get_text(id_a), get_text(id_b))
 
-# Opcional: comparar por URL o por “contiene en título”
+# Optional: compare by URL or by "contains in title"
 def compare_course_urls(con: sqlite3.Connection, url_a: str, url_b: str) -> float:
     ra = con.execute("SELECT course_id FROM courses WHERE url=?", (url_a,)).fetchone()
     rb = con.execute("SELECT course_id FROM courses WHERE url=?", (url_b,)).fetchone()
