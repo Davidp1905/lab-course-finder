@@ -16,11 +16,8 @@
 8. [Search: Interest-Based Retrieval](#search-interest-based-retrieval)  
 9. [Similarity: Cosine [0,1]](#similarity-cosine-01)  
 10. [End-to-End Runbook (Windows-friendly)](#end-to-end-runbook-windows-friendly)  
-11. [Data Quality Checks & Troubleshooting](#data-quality-checks--troubleshooting)  
-12. [Design Decisions](#design-decisions)  
-13. [Limitations](#limitations)  
-14. [Conclusions](#conclusions)  
-15. [Next Steps](#next-steps)
+11. [Limitations](#limitations)  
+12. [Conclusions](#conclusions)  
 
 ---
 
