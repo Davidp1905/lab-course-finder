@@ -243,11 +243,11 @@ python compare.py --db data\cursos.sqlite --ids 10 25
 ```
 By URL:
 ```bat
-python compare.py --db data\cursos.sqlite --urls "https://educacionvirtual.javeriana.edu.co/curso-a" "https://educacionvirtual.javeriana.edu.co/curso-b"
+python compare.py --db data\cursos.sqlite --urls "https://educacionvirtual.javeriana.edu.co/modelos-financieros-en-la-era-del-machine-learning" "https://educacionvirtual.javeriana.edu.co/analitica-de-datos-automatizacion-inteligente-de-procesos"
 ```
 By “title contains”:
 ```bat
-python compare.py --db data\cursos.sqlite --titles "arquitectura" "interiorismo"
+python compare.py --db data\cursos.sqlite --titles "Modelos financieros en la era del machine learning" "Analítica de datos y automatización de procesos en Power BI y automate"
 ```
 
 ---
