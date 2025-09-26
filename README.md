@@ -4,6 +4,7 @@
 * Andrés David Pérez Cely
 * Ángel Eduardo Morales Abril
 
+---
 
 > **Goal**  
 > Build an end-to-end pipeline that: crawls the Javeriana’s public “Programas” catalog, stores only _Courses_ in a database, indexes their text, enables word lookups and interest-based search, and computes course similarity using cosine distance.
